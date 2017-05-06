@@ -1,7 +1,7 @@
 var PIECES =  { EMPTY : 0, wP : 1, wN : 2, wB : 3,wR : 4, wQ : 5, wK : 6, 
               bP : 7, bN : 8, bB : 9, bR : 10, bQ : 11, bK : 12  };
               
-var BRD_SQ_NUM = 120;
+var BRD_SQ_NUM = 120; //board squares number
 
 var FILES =  { FILE_A:0, FILE_B:1, FILE_C:2, FILE_D:3, 
 	FILE_E:4, FILE_F:5, FILE_G:6, FILE_H:7, FILE_NONE:8 };
@@ -18,3 +18,10 @@ var SQUARES = {
 };
 
 var BOOL = { FALSE:0, TRUE:1 };
+
+var FilesBrd = new Array(BRD_SQ_NUM);
+var RanksBrd = new Array(BRD_SQ_NUM);
+
+function FR2SQ(f,r) {
+ 	return ( (21 + (f) ) + ( (r) * 10 ) );
+}
