@@ -17,6 +17,8 @@ var SQUARES = {
 	NO_SQ:99, OFFBOARD:100
 };
 
+var CASTLEBIT = {WKCA:1, WQCA:2, BKCA:4, BQCA:8}
+
 var BOOL = { FALSE:0, TRUE:1 };
 
 var FilesBrd = new Array(BRD_SQ_NUM);
