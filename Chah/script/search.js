@@ -10,6 +10,14 @@ SearchController.stop;
 SearchController.best;
 SearchController.thinking;
 
+function ClearPvTable() {
+	
+	for(index = 0; index < PVENTRIES; index++) {
+			GameBoard.PvTable[index].move = NOMOVE;
+			GameBoard.PvTable[index].posKey = 0;		
+	}
+}
+
 function CheckUp() {
 	if (( $.now() - SearchController.start ) > SearchController.time) {
 		SearchController.stop == BOOL.TRUE;
@@ -46,7 +54,12 @@ function AlphaBeta(alpha, beta, depth) {
 	
 	if(GameBoard.ply > MAXDEPTH -1) {
 		return EvalPosition();
-	}
+	}	
+	
+	var InCheck = SqAttacked(GameBoard.pList[PCEINDEX(Kings[GameBoard.side],0)], GameBoard.side^1);
+	if(InCheck == BOOL.TRUE)  {
+		depth++;
+	}	
 	
 	var Score = -INFINITE;
 	
@@ -96,15 +109,43 @@ function AlphaBeta(alpha, beta, depth) {
 			BestMove = Move;
 			/* Update History Table */
 		}		
-	}
+	}	
 	
-	/* Mate Check */
+	if(Legal == 0) {
+		if(InCheck == BOOL.TRUE) {
+			return -MATE + GameBoard.ply;
+		} else {
+			return 0;
+		}
+	}	
 	
 	if(alpha != OldAlpha) {
-		/* Store PvMove */
+		StorePvMove(BestMove);
 	}
 	
 	return alpha;
+}
+
+function ClearForSearch() {
+
+	var index = 0;
+	var index2 = 0;
+	
+	for(index = 0; index < 14 * BRD_SQ_NUM; ++index) {		
+		GameBoard.searchHistory[index] = 0;	
+	}
+	
+	for(index = 0; index < 3 * MAXDEPTH; ++index) {
+		GameBoard.searchKillers[index] = 0;
+	}	
+	
+	ClearPvTable();
+	GameBoard.ply = 0;
+	SearchController.nodes = 0;
+	SearchController.fh = 0;
+	SearchController.fhf = 0;
+	SearchController.start = $.now();
+	SearchController.stop = BOOL.FALSE;
 }
 
 function SearchPosition() {
@@ -112,6 +153,8 @@ function SearchPosition() {
 	var bestMove = NOMOVE;
 	var bestScore = -INFINITE;
 	var currentDepth = 0;
+	
+	ClearForSearch();
 	
 	for( currentDepth = 1; currentDepth <= /*SearchController.depth*/ 1; ++currentDepth) {
 		
