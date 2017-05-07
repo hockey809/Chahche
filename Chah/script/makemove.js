@@ -54,3 +54,9 @@ function MovePiece(from, to) {
 	}
 	
 }
+
+function MakeMove(move) {
+
+	
+
+}

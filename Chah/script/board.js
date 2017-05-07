@@ -1,3 +1,4 @@
+
 function PCEINDEX(pce, pceNum) {
 	return (pce * 10 + pceNum);
 }
@@ -8,17 +9,65 @@ GameBoard.pieces = new Array(BRD_SQ_NUM);
 GameBoard.side = COLOURS.WHITE;
 GameBoard.fiftyMove = 0;
 GameBoard.hisPly = 0;
+GameBoard.history = [];
 GameBoard.ply = 0;
-GameBoard.enPas = 0; //look up the En passant move
-GameBoard.castlePerm = 0; //castling permission
+GameBoard.enPas = 0; //look up En passant move
+GameBoard.castlePerm = 0;//castling permission
 GameBoard.material = new Array(2); // WHITE,BLACK material of pieces
 GameBoard.pceNum = new Array(13); // indexed by Pce
 GameBoard.pList = new Array(14 * 10);
 GameBoard.posKey = 0;
-
 GameBoard.moveList = new Array(MAXDEPTH * MAXPOSITIONMOVES);
 GameBoard.moveScores = new Array(MAXDEPTH * MAXPOSITIONMOVES);
 GameBoard.moveListStart = new Array(MAXDEPTH);
+
+function CheckBoard() {   
+ 
+	var t_pceNum = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+	var t_material = [ 0, 0];
+	var sq64, t_piece, t_pce_num, sq120, colour, pcount;
+	
+	for(t_piece = PIECES.wP; t_piece <= PIECES.bK; ++t_piece) {
+		for(t_pce_num = 0; t_pce_num < GameBoard.pceNum[t_piece]; ++t_pce_num) {
+			sq120 = GameBoard.pList[PCEINDEX(t_piece,t_pce_num)];
+			if(GameBoard.pieces[sq120] != t_piece) {
+				console.log('Error Pce Lists');
+				return BOOL.FALSE;
+			}
+		}	
+	}
+	
+	for(sq64 = 0; sq64 < 64; ++sq64) {
+		sq120 = SQ120(sq64);
+		t_piece = GameBoard.pieces[sq120];
+		t_pceNum[t_piece]++;
+		t_material[PieceCol[t_piece]] += PieceVal[t_piece];
+	}
+	
+	for(t_piece = PIECES.wP; t_piece <= PIECES.bK; ++t_piece) {
+		if(t_pceNum[t_piece] != GameBoard.pceNum[t_piece]) {
+				console.log('Error t_pceNum');
+				return BOOL.FALSE;
+			}	
+	}
+	
+	if(t_material[COLOURS.WHITE] != GameBoard.material[COLOURS.WHITE] ||
+			 t_material[COLOURS.BLACK] != GameBoard.material[COLOURS.BLACK]) {
+				console.log('Error t_material');
+				return BOOL.FALSE;
+	}	
+	
+	if(GameBoard.side!=COLOURS.WHITE && GameBoard.side!=COLOURS.BLACK) {
+				console.log('Error GameBoard.side');
+				return BOOL.FALSE;
+	}
+	
+	if(GeneratePosKey()!=GameBoard.posKey) {
+				console.log('Error GameBoard.posKey');
+				return BOOL.FALSE;
+	}	
+	return BOOL.TRUE;
+}
 
 function PrintBoard() {
 	
@@ -55,6 +104,7 @@ function PrintBoard() {
 }
 
 function GeneratePosKey() {
+
 	var sq = 0;
 	var finalKey = 0;
 	var piece = PIECES.EMPTY;
@@ -77,6 +127,7 @@ function GeneratePosKey() {
 	finalKey ^= CastleKeys[GameBoard.castlePerm];
 	
 	return finalKey;
+
 }
 
 function PrintPieceLists() {
@@ -88,6 +139,7 @@ function PrintPieceLists() {
 			console.log('Piece ' + PceChar[piece] + ' on ' + PrSq( GameBoard.pList[PCEINDEX(piece,pceNum)] ));
 		}
 	}
+
 }
 
 function UpdateListsMaterial() {	
@@ -110,7 +162,7 @@ function UpdateListsMaterial() {
 		sq = SQ120(index);
 		piece = GameBoard.pieces[sq];
 		if(piece != PIECES.EMPTY) {
-			//console.log('piece ' + piece + ' on ' + sq);
+			
 			colour = PieceCol[piece];		
 			
 			GameBoard.material[colour] += PieceVal[piece];
@@ -119,18 +171,21 @@ function UpdateListsMaterial() {
 			GameBoard.pceNum[piece]++;			
 		}
 	}
+	
 	PrintPieceLists();
+	
 }
 
 function ResetBoard() {
+	
 	var index = 0;
 	
 	for(index = 0; index < BRD_SQ_NUM; ++index) {
 		GameBoard.pieces[index] = SQUARES.OFFBOARD;
-	}	
+	}
 	
-	for(index = 0; index < 13; ++index) {
-		GameBoard.pceNum[index] = 0;
+	for(index = 0; index < 64; ++index) {
+		GameBoard.pieces[SQ120(index)] = PIECES.EMPTY;
 	}
 	
 	GameBoard.side = COLOURS.BOTH;
@@ -141,7 +196,10 @@ function ResetBoard() {
 	GameBoard.castlePerm = 0;	
 	GameBoard.posKey = 0;
 	GameBoard.moveListStart[GameBoard.ply] = 0;
+	
 }
+
+//rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 
 function ParseFen(fen) {
 
@@ -201,8 +259,9 @@ function ParseFen(fen) {
 			file++;
         }
 		fenCnt++;
-	}
+	} // while loop end
 	
+	//rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1
 	GameBoard.side = (fen[fenCnt] == 'w') ? COLOURS.WHITE : COLOURS.BLACK;
 	fenCnt += 2;
 	
@@ -228,7 +287,7 @@ function ParseFen(fen) {
 		GameBoard.enPas = FR2SQ(file,rank);		
     }
 	
-	GameBoard.posKey = GeneratePosKey();
+	GameBoard.posKey = GeneratePosKey();	
 	UpdateListsMaterial();
 	PrintSqAttacked();
 }
@@ -236,13 +295,14 @@ function ParseFen(fen) {
 function PrintSqAttacked() {
 	
 	var sq,file,rank,piece;
+
 	console.log("\nAttacked:\n");
 	
 	for(rank = RANKS.RANK_8; rank >= RANKS.RANK_1; rank--) {
 		var line =((rank+1) + "  ");
 		for(file = FILES.FILE_A; file <= FILES.FILE_H; file++) {
 			sq = FR2SQ(file,rank);
-			if(SqAttacked(sq, GameBoard.side) == BOOL.TRUE) piece = "X";
+			if(SqAttacked(sq, GameBoard.side^1) == BOOL.TRUE) piece = "X";
 			else piece = "-";
 			line += (" " + piece + " ");
 		}
@@ -250,7 +310,7 @@ function PrintSqAttacked() {
 	}
 	
 	console.log("");
-
+	
 }
 
 function SqAttacked(sq, side) {
@@ -315,4 +375,6 @@ function SqAttacked(sq, side) {
 	}
 	
 	return BOOL.FALSE;
+	
+
 }
