@@ -156,7 +156,7 @@ function SearchPosition() {
 	
 	ClearForSearch();
 	
-	for( currentDepth = 1; currentDepth <= /*SearchController.depth*/ 1; ++currentDepth) {
+	for( currentDepth = 1; currentDepth <= /*SearchController.depth*/ 5; ++currentDepth) {
 		
 		/* AB */
 		

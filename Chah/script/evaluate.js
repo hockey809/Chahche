@@ -111,14 +111,14 @@ function EvalPosition() {
 	pce = PIECES.bQ;	
 	for(pceNum = 0; pceNum < GameBoard.pceNum[pce]; ++pceNum) {
 		sq = GameBoard.pList[PCEINDEX(pce,pceNum)];
-		score -= RookTable[MIRROR64(SQ64(sq))]/2;
+		score -= RookTable[MIRROR64(SQ64(sq))];
 	}	
 	
-	if(GameBoard.pceNum[wB] >= 2) {
+	if(GameBoard.pceNum[PIECES.wB] >= 2) {
 		score += BishopPair;
 	}
 	
-	if(GameBoard.pceNum[bB] >= 2) {
+	if(GameBoard.pceNum[PIECES.bB] >= 2) {
 		score -= BishopPair;
 	}
 	
