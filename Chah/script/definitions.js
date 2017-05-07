@@ -1,7 +1,7 @@
 var PIECES =  { EMPTY : 0, wP : 1, wN : 2, wB : 3,wR : 4, wQ : 5, wK : 6, 
               bP : 7, bN : 8, bB : 9, bR : 10, bQ : 11, bK : 12  };
               
-var BRD_SQ_NUM = 120; //board squares number
+var BRD_SQ_NUM = 120; // board squares number
 
 var FILES =  { FILE_A:0, FILE_B:1, FILE_C:2, FILE_D:3, 
 	FILE_E:4, FILE_F:5, FILE_G:6, FILE_H:7, FILE_NONE:8 };
@@ -11,13 +11,13 @@ var RANKS =  { RANK_1:0, RANK_2:1, RANK_3:2, RANK_4:3,
 	
 var COLOURS = { WHITE:0, BLACK:1, BOTH:2 };
 
-var SQUARES = {
-	A1:21, B1:22, C1:23, D1:24, E1:25, F1:26, G1:27, H1:28,  
-	A8:91, B8:92, C8:93, D8:94, E8:95, F8:96, G8:97, H8:98, 
-	NO_SQ:99, OFFBOARD:100
-};
+var CASTLEBIT = { WKCA : 1, WQCA : 2, BKCA : 4, BQCA : 8 };
 
-var CASTLEBIT = {WKCA:1, WQCA:2, BKCA:4, BQCA:8}
+var SQUARES = {
+  A1:21, B1:22, C1:23, D1:24, E1:25, F1:26, G1:27, H1:28,  
+  A8:91, B8:92, C8:93, D8:94, E8:95, F8:96, G8:97, H8:98, 
+  NO_SQ:99, OFFBOARD:100
+};
 
 var BOOL = { FALSE:0, TRUE:1 };
 
@@ -28,7 +28,7 @@ var MAXDEPTH = 64;
 var FilesBrd = new Array(BRD_SQ_NUM);
 var RanksBrd = new Array(BRD_SQ_NUM);
 
-var START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+var START_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b KQkq - 0 1";
 
 var PceChar = ".PNBRQKpnbrqk";
 var SideChar = "wb-";
@@ -52,19 +52,20 @@ var PieceKing = [ BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BO
 var PieceRookQueen = [ BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.TRUE, BOOL.TRUE, BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.TRUE, BOOL.TRUE, BOOL.FALSE ];
 var PieceBishopQueen = [ BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.TRUE, BOOL.FALSE, BOOL.TRUE, BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.TRUE, BOOL.FALSE, BOOL.TRUE, BOOL.FALSE ];
 var PieceSlides = [ BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.TRUE, BOOL.TRUE, BOOL.TRUE, BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.TRUE, BOOL.TRUE, BOOL.TRUE, BOOL.FALSE ];
-// the long rows above governed by var PIECES - look at the top of the file^^
+//the long rows above are governed by var Pieces - look at the top of the file
 
-var KnDir = [ -8, -19,	-21, -12, 8, 19, 21, 12 ];  //
-var RkDir = [ -1, -10,	1, 10 ];                    //basically the directions in wich
-var BiDir = [ -9, -11, 11, 9 ];                     //they can attack
-var KiDir = [ -1, -10,	1, 10, -9, -11, 11, 9 ];    //
+
+var KnDir = [ -8, -19,	-21, -12, 8, 19, 21, 12 ];//
+var RkDir = [ -1, -10,	1, 10 ];				  //basically their possible directions of movement
+var BiDir = [ -9, -11, 11, 9 ];					  //
+var KiDir = [ -1, -10,	1, 10, -9, -11, 11, 9 ];  //
 
 var DirNum = [ 0, 0, 8, 4, 4, 8, 8, 0, 8, 4, 4, 8, 8 ];
 var PceDir = [ 0, 0, KnDir, BiDir, RkDir, KiDir, KiDir, 0, KnDir, BiDir, RkDir, KiDir, KiDir ];
 var LoopNonSlidePce = [ PIECES.wN, PIECES.wK, 0, PIECES.bN, PIECES.bK, 0 ];
 var LoopNonSlideIndex = [ 0, 3 ];
-var LoopSlidePiece = [ PIECES.wB, PIECES.wR, PIECES.wQ, 0, PIECES.bB, PIECES.bR, PIECES.bQ, 0 ];
-var LoopSlidePieceIndex = [ 0, 4];
+var LoopSlidePce = [ PIECES.wB, PIECES.wR, PIECES.wQ, 0, PIECES.bB, PIECES.bR, PIECES.bQ, 0 ];
+var LoopSlideIndex = [ 0, 4];
 
 var PieceKeys = new Array(14 * 120);
 var SideKey;
@@ -74,8 +75,10 @@ var Sq120ToSq64 = new Array(BRD_SQ_NUM);
 var Sq64ToSq120 = new Array(64);
 
 function RAND_32() {
+
 	return (Math.floor((Math.random()*255)+1) << 23) | (Math.floor((Math.random()*255)+1) << 16)
 		 | (Math.floor((Math.random()*255)+1) << 8) | Math.floor((Math.random()*255)+1);
+
 }
 
 function SQ64(sq120) { 
@@ -108,7 +111,7 @@ function PROMOTED(m) { return ( (m >> 20) & 0xF); }
 
 var MFLAGEP = 0x40000;
 var MFLAGPS = 0x80000;
-var MFLAGCA = 0x100000;
+var MFLAGCA = 0x1000000;
 
 var MFLAGCAP = 0x7C000;
 var MFLAGPROM = 0xF00000;

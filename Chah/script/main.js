@@ -1,8 +1,10 @@
 $(function() {
 	init();
-	console.log("Main Init Called");
+	console.log("Main Init Called");	
 	ParseFen(START_FEN);
 	PrintBoard();
+	GenerateMoves();
+	PrintMoveList();
 });
 
 function InitFilesRanksBrd() {
@@ -41,6 +43,7 @@ function InitHashKeys() {
 }
 
 function InitSq120To64() {
+
 	var index = 0;
 	var file = FILES.FILE_A;
 	var rank = RANKS.RANK_1;
@@ -63,6 +66,7 @@ function InitSq120To64() {
 			sq64++;
 		}
 	}
+
 }
 
 function init() {
