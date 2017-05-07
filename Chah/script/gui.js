@@ -112,6 +112,7 @@ function MakeUserMove() {
 			PrintBoard();
 			MoveGUIPiece(parsed);
 			CheckAndSet();
+			PreSearch();
 		}
 	
 		DeSelectSq(UserMove.from);
@@ -280,4 +281,30 @@ function CheckAndSet() {
 		GameController.GameOver = BOOL.FALSE;
 		$("#GameStatus").text('');
 	}
+}
+
+function PreSearch() {
+	if(GameController.GameOver == BOOL.FALSE) {
+		SearchController.thinking = BOOL.TRUE;
+		setTimeout( function() { StartSearch(); }, 200 );
+	}
+}
+
+$('#SearchButton').click( function () {	
+	GameController.PlayerSide = GameController.side ^ 1;
+	PreSearch();
+});
+
+function StartSearch() {
+
+	SearchController.depth = MAXDEPTH;
+	var t = $.now();
+	var tt = $('#ThinkTimeChoice').val();
+	
+	SearchController.time = parseInt(tt) * 1000;
+	SearchPosition();
+	
+	MakeMove(SearchController.best);
+	MoveGUIPiece(SearchController.best);
+	CheckAndSet();
 }
