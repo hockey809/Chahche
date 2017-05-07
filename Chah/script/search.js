@@ -36,18 +36,94 @@ function IsRepetition() {
 	return BOOL.FALSE;
 }
 
+function Quiescence(alpha, beta) {
+
+	if ((SearchController.nodes & 2047) == 0) {
+		CheckUp();
+	}
+	
+	SearchController.nodes++;
+	
+	if( (IsRepetition() || GameBoard.fiftyMove >= 100) && GameBoard.ply != 0) {
+		return 0;
+	}
+	
+	if(GameBoard.ply > MAXDEPTH -1) {
+		return EvalPosition();
+	}	
+	
+	var Score = EvalPosition();
+	
+	if(Score >= beta) {
+		return beta;
+	}
+	
+	if(Score > alpha) {
+		alpha = Score;
+	}
+	
+	GenerateCaptures();
+	
+	var MoveNum = 0;
+	var Legal = 0;
+	var OldAlpha = alpha;
+	var BestMove = NOMOVE;
+	var Move = NOMOVE;
+	
+	/* Get PvMove */
+	/* Order PvMove */	
+	
+	for(MoveNum = GameBoard.moveListStart[GameBoard.ply]; MoveNum < GameBoard.moveListStart[GameBoard.ply + 1]; ++MoveNum) {
+	
+		/* Pick Next Best Move */
+		
+		Move = GameBoard.moveList[MoveNum];	
+
+		if(MakeMove(Move) == BOOL.FALSE) {
+			continue;
+		}		
+		Legal++;
+		Score = -Quiescence( -beta, -alpha);
+		
+		TakeMove();
+		
+		if(SearchController.stop == BOOL.TRUE) {
+			return 0;
+		}
+		
+		if(Score > alpha) {
+			if(Score >= beta) {
+				if(Legal == 1) {
+					SearchController.fhf++;
+				}
+				SearchController.fh++;	
+				return beta;
+			}
+			alpha = Score;
+			BestMove = Move;
+		}		
+	}
+	
+	if(alpha != OldAlpha) {
+		StorePvMove(BestMove);
+	}
+	
+	return alpha;
+
+}
+
 function AlphaBeta(alpha, beta, depth) {
 
-	SearchController.nodes++;
+	
 	if(depth <= 0) {
-		return EvalPosition();
+		return Quiescence(alpha, beta);
 	}
 	
 	if ((SearchController.nodes & 2047) == 0) {
 		CheckUp();
 	}
 	
-	
+	SearchController.nodes++;
 	
 	if( (IsRepetition() || GameBoard.fiftyMove >= 100) && GameBoard.ply != 0) {
 		return 0;

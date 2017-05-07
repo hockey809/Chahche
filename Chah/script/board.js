@@ -11,8 +11,8 @@ GameBoard.fiftyMove = 0;
 GameBoard.hisPly = 0;
 GameBoard.history = [];
 GameBoard.ply = 0;
-GameBoard.enPas = 0; //look up En passant move
-GameBoard.castlePerm = 0;//castling permission
+GameBoard.enPas = 0;
+GameBoard.castlePerm = 0;
 GameBoard.material = new Array(2); // WHITE,BLACK material of pieces
 GameBoard.pceNum = new Array(13); // indexed by Pce
 GameBoard.pList = new Array(14 * 10);
@@ -21,9 +21,11 @@ GameBoard.moveList = new Array(MAXDEPTH * MAXPOSITIONMOVES);
 GameBoard.moveScores = new Array(MAXDEPTH * MAXPOSITIONMOVES);
 GameBoard.moveListStart = new Array(MAXDEPTH);
 GameBoard.PvTable = [];
-GameBoard.PvArray = new Array(MAXDEPTH)
+GameBoard.PvArray = new Array(MAXDEPTH);
 GameBoard.searchHistory = new Array( 14 * BRD_SQ_NUM);
 GameBoard.searchKillers = new Array(3 * MAXDEPTH);
+
+
 
 function CheckBoard() {   
  
@@ -176,8 +178,6 @@ function UpdateListsMaterial() {
 		}
 	}
 	
-	PrintPieceLists();
-	
 }
 
 function ResetBoard() {
@@ -293,7 +293,6 @@ function ParseFen(fen) {
 	
 	GameBoard.posKey = GeneratePosKey();	
 	UpdateListsMaterial();
-	PrintSqAttacked();
 }
 
 function PrintSqAttacked() {
