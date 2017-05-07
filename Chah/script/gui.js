@@ -78,15 +78,44 @@ function ClickedSquare(pageX, pageY) {
 	
 	console.log('Clicked sq:' + PrSq(sq));
 	
-	SetSqSelected(sq);
+	SetSqSelected(sq);	
+	
+	return sq;
 }
 
 $(document).on('click','.Piece', function (e) {
 	console.log('Piece Click');
-	ClickedSquare(e.pageX, e.pageY);
+	
+	if(UserMove.from == SQUARES.NO_SQ) {
+		UserMove.from = ClickedSquare(e.pageX, e.pageY);
+	} else {
+		UserMove.to = ClickedSquare(e.pageX, e.pageY);
+	}
+	
+	MakeUserMove();
+	
 });
 
 $(document).on('click','.Square', function (e) {
-	console.log('Square Click');
-	ClickedSquare(e.pageX, e.pageY);
+	console.log('Square Click');	
+	if(UserMove.from != SQUARES.NO_SQ) {
+		UserMove.to = ClickedSquare(e.pageX, e.pageY);
+		MakeUserMove();
+	}
+
 });
+
+function MakeUserMove() {
+
+	if(UserMove.from != SQUARES.NO_SQ && UserMove.to != SQUARES.NO_SQ) {
+	
+		console.log("User Move:" + PrSq(UserMove.from) + PrSq(UserMove.to));	
+	
+		DeSelectSq(UserMove.from);
+		DeSelectSq(UserMove.to);
+		
+		UserMove.from = SQUARES.NO_SQ;
+		UserMove.to = SQUARES.NO_SQ;
+	}
+
+}
