@@ -3,4 +3,5 @@ function generateFEN(){
 	var fenStr = $("#fenIn").val();	
 	ParseFen(fenStr);
 	PrintBoard();
+	PerftTest(5);
 }
