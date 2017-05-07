@@ -19,7 +19,7 @@ function PickNextMove(MoveNum) {
 	for(index = MoveNum; index < GameBoard.moveListStart[GameBoard.ply+1]; ++index) {
 		if(GameBoard.moveScores[index] > bestScore) {
 			bestScore = GameBoard.moveScores[index];
-			bestNum = index;
+			bestNum = index;			
 		}
 	} 
 	
@@ -94,10 +94,7 @@ function Quiescence(alpha, beta) {
 	var Legal = 0;
 	var OldAlpha = alpha;
 	var BestMove = NOMOVE;
-	var Move = NOMOVE;
-	
-	/* Get PvMove */
-	/* Order PvMove */	
+	var Move = NOMOVE;	
 	
 	for(MoveNum = GameBoard.moveListStart[GameBoard.ply]; MoveNum < GameBoard.moveListStart[GameBoard.ply + 1]; ++MoveNum) {
 	
@@ -172,17 +169,24 @@ function AlphaBeta(alpha, beta, depth) {
 	var Legal = 0;
 	var OldAlpha = alpha;
 	var BestMove = NOMOVE;
-	var Move = NOMOVE;
+	var Move = NOMOVE;	
 	
-	/* Get PvMove */
-	/* Order PvMove */	
+	var PvMove = ProbePvTable();
+	if(PvMove != NOMOVE) {
+		for(MoveNum = GameBoard.moveListStart[GameBoard.ply]; MoveNum < GameBoard.moveListStart[GameBoard.ply + 1]; ++MoveNum) {
+			if(GameBoard.moveList[MoveNum] == PvMove) {
+				GameBoard.moveScores[MoveNum] = 2000000;
+				break;
+			}
+		}
+	}
 	
 	for(MoveNum = GameBoard.moveListStart[GameBoard.ply]; MoveNum < GameBoard.moveListStart[GameBoard.ply + 1]; ++MoveNum) {
 	
-		PickNextMove(MoveNum);
+		PickNextMove(MoveNum);	
 		
 		Move = GameBoard.moveList[MoveNum];	
-
+		
 		if(MakeMove(Move) == BOOL.FALSE) {
 			continue;
 		}		
@@ -200,14 +204,20 @@ function AlphaBeta(alpha, beta, depth) {
 				if(Legal == 1) {
 					SearchController.fhf++;
 				}
-				SearchController.fh++;				
-				/* Update Killer Moves */
-				
+				SearchController.fh++;		
+				if((Move & MFLAGCAP) == 0) {
+					GameBoard.searchKillers[MAXDEPTH + GameBoard.ply] = 
+						GameBoard.searchKillers[GameBoard.ply];
+					GameBoard.searchKillers[GameBoard.ply] = Move;
+				}					
 				return beta;
 			}
+			if((Move & MFLAGCAP) == 0) {
+				GameBoard.searchHistory[GameBoard.pieces[FROMSQ(Move)] * BRD_SQ_NUM + TOSQ(Move)]
+						 += depth * depth;
+			}
 			alpha = Score;
-			BestMove = Move;
-			/* Update History Table */
+			BestMove = Move;				
 		}		
 	}	
 	
@@ -231,7 +241,7 @@ function ClearForSearch() {
 	var index = 0;
 	var index2 = 0;
 	
-	for(index = 0; index < 14 * BRD_SQ_NUM; ++index) {		
+	for(index = 0; index < 14 * BRD_SQ_NUM; ++index) {				
 		GameBoard.searchHistory[index] = 0;	
 	}
 	
@@ -258,7 +268,7 @@ function SearchPosition() {
 	var c;
 	ClearForSearch();
 	
-	for( currentDepth = 1; currentDepth <= /*SearchController.depth*/ 5; ++currentDepth) {	
+	for( currentDepth = 1; currentDepth <= /*SearchController.depth*/ 6; ++currentDepth) {	
 	
 		bestScore = AlphaBeta(-INFINITE, INFINITE, currentDepth);
 					
