@@ -126,3 +126,35 @@ function MakeUserMove() {
 	}
 
 }
+
+function PieceIsOnSq(sq, top, left) {
+
+	if( (RanksBrd[sq] == 7 - Math.round(top/60) ) && 
+		FilesBrd[sq] == Math.round(left/60) ) {
+		return BOOL.TRUE;
+	}
+		
+	return BOOL.FALSE;
+
+}
+
+function RemoveGUIPiece(sq) {
+
+	$('.Piece').each( function(index) {
+		if(PieceIsOnSq(sq, $(this).position().top, $(this).position().left) == BOOL.TRUE) {
+			$(this).remove();
+		}
+	} );
+	
+}
+
+function AddGUIPiece(sq, pce) {
+
+	var file = FilesBrd[sq];
+	var rank = RanksBrd[sq];
+	var rankName = "rank" + (rank+1);
+	var	fileName = "file" + (file+1);
+	var pieceFileName = "images/" + SideChar[PieceCol[pce]] + PceChar[pce].toUpperCase() + ".png";
+	var	imageString = "<image src=\"" + pieceFileName + "\" class=\"Piece " + rankName + " " + fileName + "\"/>";
+	$("#Board").append(imageString);
+}
