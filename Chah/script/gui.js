@@ -116,6 +116,7 @@ function MakeUserMove() {
 		if(parsed != NOMOVE) {
 			MakeMove(parsed);
 			PrintBoard();
+			MoveGUIPiece(parsed);
 		}
 	
 		DeSelectSq(UserMove.from);
@@ -157,4 +158,47 @@ function AddGUIPiece(sq, pce) {
 	var pieceFileName = "images/" + SideChar[PieceCol[pce]] + PceChar[pce].toUpperCase() + ".png";
 	var	imageString = "<image src=\"" + pieceFileName + "\" class=\"Piece " + rankName + " " + fileName + "\"/>";
 	$("#Board").append(imageString);
+}
+
+function MoveGUIPiece(move) {
+	
+	var from = FROMSQ(move);
+	var to = TOSQ(move);	
+	
+	if(move & MFLAGEP) {
+		var epRemove;
+		if(GameBoard.side == COLOURS.BLACK) {
+			epRemove = to - 10;
+		} else {
+			epRemove = to + 10;
+		}
+		RemoveGUIPiece(epRemove);
+	} else if(CAPTURED(move)) {
+		RemoveGUIPiece(to);
+	}
+	
+	var file = FilesBrd[to];
+	var rank = RanksBrd[to];
+	var rankName = "rank" + (rank+1);
+	var	fileName = "file" + (file+1);
+	
+	$('.Piece').each( function(index) {
+		if(PieceIsOnSq(from, $(this).position().top, $(this).position().left) == BOOL.TRUE) {
+			$(this).removeClass();
+			$(this).addClass("Piece " + rankName + " " + fileName);
+		}
+	} );
+	
+	if(move & MFLAGCA) {
+		switch(to) {
+			case SQUARES.G1: RemoveGUIPiece(SQUARES.H1); AddGUIPiece(SQUARES.F1, PIECES.wR); break;
+			case SQUARES.C1: RemoveGUIPiece(SQUARES.A1); AddGUIPiece(SQUARES.D1, PIECES.wR); break;
+			case SQUARES.G8: RemoveGUIPiece(SQUARES.H8); AddGUIPiece(SQUARES.F8, PIECES.bR); break;
+			case SQUARES.C8: RemoveGUIPiece(SQUARES.A8); AddGUIPiece(SQUARES.D8, PIECES.bR); break;
+		}
+	} else if (PROMOTED(move)) {
+		RemoveGUIPiece(to);
+		AddGUIPiece(to, PROMOTED(move));
+	}
+	
 }
