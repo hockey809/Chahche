@@ -52,7 +52,12 @@ var PieceKing = [ BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BO
 var PieceRookQueen = [ BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.TRUE, BOOL.TRUE, BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.TRUE, BOOL.TRUE, BOOL.FALSE ];
 var PieceBishopQueen = [ BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.TRUE, BOOL.FALSE, BOOL.TRUE, BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.TRUE, BOOL.FALSE, BOOL.TRUE, BOOL.FALSE ];
 var PieceSlides = [ BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.TRUE, BOOL.TRUE, BOOL.TRUE, BOOL.FALSE, BOOL.FALSE, BOOL.FALSE, BOOL.TRUE, BOOL.TRUE, BOOL.TRUE, BOOL.FALSE ];
-// rows 31-43 is governed by var PIECES - look ot the top of the file^^
+// the long rows above governed by var PIECES - look at the top of the file^^
+
+var KnDir = [ -8, -19,	-21, -12, 8, 19, 21, 12 ];  //
+var RkDir = [ -1, -10,	1, 10 ];                    //basically the directions in wich
+var BiDir = [ -9, -11, 11, 9 ];                     //they can attack
+var KiDir = [ -1, -10,	1, 10, -9, -11, 11, 9 ];    //
 
 var PieceKeys = new Array(14 * 120);
 var SideKey;
