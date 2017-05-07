@@ -3,7 +3,7 @@ $(function() {
 	console.log("Main Init Called");	
 	ParseFen(START_FEN);
 	PrintBoard();
-	
+	SearchPosition();
 });
 
 function InitFilesRanksBrd() {
@@ -80,6 +80,13 @@ function InitBoardVars() {
 			posKey : 0
 		});
 	}	
+	
+	for(index = 0; index < PVENTRIES; ++index) {
+		GameBoard.PvTable.push({
+			move : NOMOVE,
+			posKey : 0
+		});
+	}
 }
 
 function init() {

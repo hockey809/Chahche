@@ -31,7 +31,7 @@ function IsRepetition() {
 function AlphaBeta(alpha, beta, depth) {
 
 	if(depth <= 0) {
-		/* return Evaluate() */
+		return EvalPosition();
 	}
 	
 	if ((SearchController.nodes & 2047) == 0) {
@@ -45,7 +45,7 @@ function AlphaBeta(alpha, beta, depth) {
 	}
 	
 	if(GameBoard.ply > MAXDEPTH -1) {
-		/* return Evaluate() */
+		return EvalPosition();
 	}
 	
 	var Score = -INFINITE;

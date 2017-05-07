@@ -20,6 +20,8 @@ GameBoard.posKey = 0;
 GameBoard.moveList = new Array(MAXDEPTH * MAXPOSITIONMOVES);
 GameBoard.moveScores = new Array(MAXDEPTH * MAXPOSITIONMOVES);
 GameBoard.moveListStart = new Array(MAXDEPTH);
+GameBoard.PvTable = [];
+GameBoard.PvArray = new Array(MAXDEPTH)
 
 function CheckBoard() {   
  
