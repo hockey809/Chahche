@@ -41,5 +41,52 @@ function SetInitialBoardPieces() {
 			$("#Board").append(imageString);
 		}
 	}
-
 }
+
+function DeSelectSq(sq) {
+	$('.Square').each( function(index) {
+		if( (RanksBrd[sq] == 7 - Math.round($(this).position().top/60) ) && 
+				FilesBrd[sq] == Math.round($(this).position().left/60) ) {
+				$(this).removeClass('SqSelected');
+		}
+	} );
+}
+
+function SetSqSelected(sq) {
+	$('.Square').each( function(index) {
+		if( (RanksBrd[sq] == 7 - Math.round($(this).position().top/60) ) && 
+				FilesBrd[sq] == Math.round($(this).position().left/60) ) {
+				$(this).addClass('SqSelected');
+		}
+	} );
+}
+
+function ClickedSquare(pageX, pageY) {
+	console.log('ClickedSquare() at ' + pageX + ',' + pageY);
+	var position = $('#Board').position();
+	
+	var workedX = Math.floor(position.left);
+	var workedY = Math.floor(position.top);
+	
+	pageX = Math.floor(pageX);
+	pageY = Math.floor(pageY);
+	
+	var file = Math.floor((pageX-workedX) / 60);
+	var rank = 7 - Math.floor((pageY-workedY) / 60);
+	
+	var sq = FR2SQ(file,rank);
+	
+	console.log('Clicked sq:' + PrSq(sq));
+	
+	SetSqSelected(sq);
+}
+
+$(document).on('click','.Piece', function (e) {
+	console.log('Piece Click');
+	ClickedSquare(e.pageX, e.pageY);
+});
+
+$(document).on('click','.Square', function (e) {
+	console.log('Square Click');
+	ClickedSquare(e.pageX, e.pageY);
+});
