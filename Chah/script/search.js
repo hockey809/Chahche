@@ -10,6 +10,32 @@ SearchController.stop;
 SearchController.best;
 SearchController.thinking;
 
+function PickNextMove(MoveNum) {
+
+	var index = 0;
+	var bestScore = -1;
+	var bestNum = MoveNum;
+	
+	for(index = MoveNum; index < GameBoard.moveListStart[GameBoard.ply+1]; ++index) {
+		if(GameBoard.moveScores[index] > bestScore) {
+			bestScore = GameBoard.moveScores[index];
+			bestNum = index;
+		}
+	} 
+	
+	if(bestNum != MoveNum) {
+		var temp = 0;
+		temp = GameBoard.moveScores[MoveNum];
+		GameBoard.moveScores[MoveNum] = GameBoard.moveScores[bestNum];
+		GameBoard.moveScores[bestNum] = temp;
+		
+		temp = GameBoard.moveList[MoveNum];
+		GameBoard.moveList[MoveNum] = GameBoard.moveList[bestNum];
+		GameBoard.moveList[bestNum] = temp;
+	}
+
+}
+
 function ClearPvTable() {
 	
 	for(index = 0; index < PVENTRIES; index++) {
@@ -75,7 +101,7 @@ function Quiescence(alpha, beta) {
 	
 	for(MoveNum = GameBoard.moveListStart[GameBoard.ply]; MoveNum < GameBoard.moveListStart[GameBoard.ply + 1]; ++MoveNum) {
 	
-		/* Pick Next Best Move */
+		PickNextMove(MoveNum);
 		
 		Move = GameBoard.moveList[MoveNum];	
 
@@ -153,7 +179,7 @@ function AlphaBeta(alpha, beta, depth) {
 	
 	for(MoveNum = GameBoard.moveListStart[GameBoard.ply]; MoveNum < GameBoard.moveListStart[GameBoard.ply + 1]; ++MoveNum) {
 	
-		/* Pick Next Best Move */
+		PickNextMove(MoveNum);
 		
 		Move = GameBoard.moveList[MoveNum];	
 
@@ -249,10 +275,12 @@ function SearchPosition() {
 		for( c = 0; c < PvNum; ++c) {
 			line += ' ' + PrMove(GameBoard.PvArray[c]);
 		}
+		if(currentDepth!=1) {
+			line += (" Ordering:" + ((SearchController.fhf/SearchController.fh)*100).toFixed(2) + "%");
+		}
 		console.log(line);
 						
-	}
-	
+	}	
 	
 	SearchController.best = bestMove;
 	SearchController.thinking = BOOL.FALSE;

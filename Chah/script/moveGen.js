@@ -1,3 +1,18 @@
+var MvvLvaValue = [ 0, 100, 200, 300, 400, 500, 600, 100, 200, 300, 400, 500, 600 ];
+var MvvLvaScores = new Array(14 * 14);
+
+function InitMvvLva() {
+	var Attacker;
+	var Victim;
+	
+	for(Attacker = PIECES.wP; Attacker <= PIECES.bK; ++Attacker) {
+		for(Victim = PIECES.wP; Victim <= PIECES.bK; ++Victim) {
+			MvvLvaScores[Victim * 14 + Attacker] = MvvLvaValue[Victim] + 6 - (MvvLvaValue[Attacker]/100);
+		}
+	}
+
+}
+
 function MoveExists(move) {
 	
 	GenerateMoves();
@@ -24,7 +39,8 @@ function MOVE(from, to, captured, promoted, flag) {
 
 function AddCaptureMove(move) {
 	GameBoard.moveList[GameBoard.moveListStart[GameBoard.ply+1]] = move;
-	GameBoard.moveScores[GameBoard.moveListStart[GameBoard.ply+1]++] =  0;	
+	GameBoard.moveScores[GameBoard.moveListStart[GameBoard.ply+1]++] =  
+		MvvLvaScores[CAPTURED(move) * 14 + GameBoard.pieces[FROMSQ(move)]] + 1000000;	
 }
 
 function AddQuietMove(move) {
@@ -34,7 +50,7 @@ function AddQuietMove(move) {
 
 function AddEnPassantMove(move) {
 	GameBoard.moveList[GameBoard.moveListStart[GameBoard.ply+1]] = move;
-	GameBoard.moveScores[GameBoard.moveListStart[GameBoard.ply + 1]++] = 0;
+	GameBoard.moveScores[GameBoard.moveListStart[GameBoard.ply + 1]++] = 105 + 1000000;
 }
 
 function AddWhitePawnCaptureMove(from, to, cap) {
@@ -112,7 +128,7 @@ function GenerateMoves() {
 				AddWhitePawnCaptureMove(sq, sq + 11, GameBoard.pieces[sq+11]);
 			}			
 			
-			if(GameBoard.enPas != SQUARES.NOSQ) {
+			if(GameBoard.enPas != SQUARES.NO_SQ) {
 				if(sq + 9 == GameBoard.enPas) {
 					AddEnPassantMove( MOVE(sq, sq+9, PIECES.EMPTY, PIECES.EMPTY, MFLAGEP ) );
 				}
@@ -160,7 +176,7 @@ function GenerateMoves() {
 				AddBlackPawnCaptureMove(sq, sq - 11, GameBoard.pieces[sq-11]);
 			}			
 			
-			if(GameBoard.enPas != SQUARES.NOSQ) {
+			if(GameBoard.enPas != SQUARES.NO_SQ) {
 				if(sq - 9 == GameBoard.enPas) {
 					AddEnPassantMove( MOVE(sq, sq-9, PIECES.EMPTY, PIECES.EMPTY, MFLAGEP ) );
 				}
@@ -267,7 +283,7 @@ function GenerateCaptures() {
 				AddWhitePawnCaptureMove(sq, sq + 11, GameBoard.pieces[sq+11]);
 			}			
 			
-			if(GameBoard.enPas != SQUARES.NOSQ) {
+			if(GameBoard.enPas != SQUARES.NO_SQ) {
 				if(sq + 9 == GameBoard.enPas) {
 					AddEnPassantMove( MOVE(sq, sq+9, PIECES.EMPTY, PIECES.EMPTY, MFLAGEP ) );
 				}
@@ -293,7 +309,7 @@ function GenerateCaptures() {
 				AddBlackPawnCaptureMove(sq, sq - 11, GameBoard.pieces[sq-11]);
 			}			
 			
-			if(GameBoard.enPas != SQUARES.NOSQ) {
+			if(GameBoard.enPas != SQUARES.NO_SQ) {
 				if(sq - 9 == GameBoard.enPas) {
 					AddEnPassantMove( MOVE(sq, sq-9, PIECES.EMPTY, PIECES.EMPTY, MFLAGEP ) );
 				}
