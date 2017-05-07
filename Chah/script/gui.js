@@ -4,6 +4,18 @@ function generateFEN(){
 	NewGame(fenStr);
 }
 
+function TakeBackFunction(){
+	if(GameBoard.hisPly > 0) {
+		TakeMove();
+		GameBoard.ply = 0;
+		SetInitialBoardPieces();
+	}
+}
+
+function newGameFunction(){
+	NewGame(START_FEN);
+}
+
 function NewGame(fenStr) {
 	ParseFen(fenStr);
 	PrintBoard();

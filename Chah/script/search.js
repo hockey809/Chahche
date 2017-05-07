@@ -262,6 +262,7 @@ function SearchPosition() {
 
 	var bestMove = NOMOVE;
 	var bestScore = -INFINITE;
+	var Score = -INFINITE;
 	var currentDepth = 0;
 	var line;
 	var PvNum;
@@ -270,12 +271,13 @@ function SearchPosition() {
 	
 	for( currentDepth = 1; currentDepth <= SearchController.depth; ++currentDepth) {	
 	
-		bestScore = AlphaBeta(-INFINITE, INFINITE, currentDepth);
+		Score = AlphaBeta(-INFINITE, INFINITE, currentDepth);
 					
 		if(SearchController.stop == BOOL.TRUE) {
 			break;
 		}
 		
+		bestScore = Score; 
 		bestMove = ProbePvTable();
 		line = 'D:' + currentDepth + ' Best:' + PrMove(bestMove) + ' Score:' + bestScore + 
 				' nodes:' + SearchController.nodes;
@@ -301,7 +303,7 @@ function UpdateDOMStats(dom_score, dom_depth) {
 
 	var scoreText = "Score: " + (dom_score / 100).toFixed(2);
 	if(Math.abs(dom_score) > MATE - MAXDEPTH) {
-		scoreText = "Score: Mate In " + (MATE - Math.abs(dom_score)) + " moves";
+		scoreText = "Score: Mate In " + (MATE - (Math.abs(dom_score))-1) + " moves";
 	}
 	
 	$("#OrderingOut").text("Ordering: " + ((SearchController.fhf/SearchController.fh)*100).toFixed(2) + "%");
