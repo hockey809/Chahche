@@ -8,6 +8,7 @@ function NewGame(fenStr) {
 	ParseFen(fenStr);
 	PrintBoard();
 	SetInitialBoardPieces();
+	CheckAndSet();
 }
 
 function ClearAllPieces() {
@@ -30,15 +31,8 @@ function SetInitialBoardPieces() {
 	for(sq = 0; sq < 64; ++sq) {
 		sq120 = SQ120(sq);
 		pce = GameBoard.pieces[sq120];
-		file = FilesBrd[sq120];
-		rank = RanksBrd[sq120];
-		
 		if(pce >= PIECES.wP && pce <= PIECES.bK) {
-			rankName = "rank" + (rank+1);
-			fileName = "file" + (file+1);
-			pieceFileName = "images/" + SideChar[PieceCol[pce]] + PceChar[pce].toUpperCase() + ".png";
-			imageString = "<image src=\"" + pieceFileName + "\" class=\"Piece " + rankName + " " + fileName + "\"/>";
-			$("#Board").append(imageString);
+			AddGUIPiece(sq120, pce);
 		}
 	}
 }
@@ -117,6 +111,7 @@ function MakeUserMove() {
 			MakeMove(parsed);
 			PrintBoard();
 			MoveGUIPiece(parsed);
+			CheckAndSet();
 		}
 	
 		DeSelectSq(UserMove.from);
@@ -201,4 +196,88 @@ function MoveGUIPiece(move) {
 		AddGUIPiece(to, PROMOTED(move));
 	}
 	
+}
+
+function DrawMaterial() {
+
+	if (GameBoard.pceNum[PIECES.wP]!=0 || GameBoard.pceNum[PIECES.bP]!=0) return BOOL.FALSE;
+	if (GameBoard.pceNum[PIECES.wQ]!=0 || GameBoard.pceNum[PIECES.bQ]!=0 ||
+					GameBoard.pceNum[PIECES.wR]!=0 || GameBoard.pceNum[PIECES.bR]!=0) return BOOL.FALSE;
+	if (GameBoard.pceNum[PIECES.wB] > 1 || GameBoard.pceNum[PIECES.bB] > 1) {return BOOL.FALSE;}
+    if (GameBoard.pceNum[PIECES.wN] > 1 || GameBoard.pceNum[PIECES.bN] > 1) {return BOOL.FALSE;}
+	
+	if (GameBoard.pceNum[PIECES.wN]!=0 && GameBoard.pceNum[PIECES.wB]!=0) {return BOOL.FALSE;}
+	if (GameBoard.pceNum[PIECES.bN]!=0 && GameBoard.pceNum[PIECES.bB]!=0) {return BOOL.FALSE;}
+	 
+	return BOOL.TRUE;
+}
+
+function ThreeFoldRep() {
+	var i = 0, r = 0;
+	
+	for(i = 0; i < GameBoard.hisPly; ++i) {
+		if (GameBoard.history[i].posKey == GameBoard.posKey) {
+		    r++;
+		}
+	}
+	return r;
+}
+
+function CheckResult() {
+	if(GameBoard.fiftyMove >= 100) {
+		 $("#GameStatus").text("GAME DRAWN {fifty move rule}"); 
+		 return BOOL.TRUE;
+	}
+	
+	if (ThreeFoldRep() >= 2) {
+     	$("#GameStatus").text("GAME DRAWN {3-fold repetition}"); 
+     	return BOOL.TRUE;
+    }
+	
+	if (DrawMaterial() == BOOL.TRUE) {
+     	$("#GameStatus").text("GAME DRAWN {insufficient material to mate}"); 
+     	return BOOL.TRUE;
+    }
+    
+    GenerateMoves();
+      
+    var MoveNum = 0;
+	var found = 0;
+	
+	for(MoveNum = GameBoard.moveListStart[GameBoard.ply]; MoveNum < GameBoard.moveListStart[GameBoard.ply + 1]; ++MoveNum)  {	
+       
+        if ( MakeMove(GameBoard.moveList[MoveNum]) == BOOL.FALSE)  {
+            continue;
+        }
+        found++;
+		TakeMove();
+		break;
+    }
+	
+	if(found != 0) return BOOL.FALSE;
+	
+	var InCheck = SqAttacked(GameBoard.pList[PCEINDEX(Kings[GameBoard.side],0)], GameBoard.side^1);
+	
+	if(InCheck == BOOL.TRUE) {
+		if(GameBoard.side == COLOURS.WHITE) {
+	      $("#GameStatus").text("GAME OVER {black mates}");
+	      return BOOL.TRUE;
+        } else {
+	      $("#GameStatus").text("GAME OVER {white mates}");
+	      return BOOL.TRUE;
+        }
+	} else {
+		$("#GameStatus").text("GAME DRAWN {stalemate}");return BOOL.TRUE;
+	}
+	
+	return BOOL.FALSE;	
+}
+
+function CheckAndSet() {
+	if(CheckResult() == BOOL.TRUE) {
+		GameController.GameOver = BOOL.TRUE;
+	} else {
+		GameController.GameOver = BOOL.FALSE;
+		$("#GameStatus").text('');
+	}
 }
