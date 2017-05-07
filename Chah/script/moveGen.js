@@ -8,6 +8,9 @@ function GenerateMoves() {
 	var pceType;
 	var pceNum;
 	var sq;
+	var pceIndex;
+	var pce;
+	var t_sq;
 	
 	if(GameBoard.side == COLOURS.WHITE) {
 		pceType = PIECES.wP;
@@ -15,7 +18,7 @@ function GenerateMoves() {
 		for(pceNum = 0; pceNum < GameBoard.pceNum[pceType]; ++pceType) {
 			sq = GameBoard.pList[PCEINDEX(pceType, pceNum)];
 			
-			if(GameBoard.piece[sq + 10] == PIECES.EMPTY) {
+			if(GameBoard.pieces[sq + 10] == PIECES.EMPTY) {
 				// Add Pawn Move Here
 				if(RanksBrd[sq] == RANKS.RANK_2 && GameBoard.pieces[sq + 20] == PIECES.EMPTY) {
 					// Add Quiet Move Here
@@ -38,7 +41,7 @@ function GenerateMoves() {
 				if(sq + 11 == GameBoard.enPas) {
 					// Add enPas Move
 				}
-			}
+			}			
 			
 		}
 		
@@ -57,10 +60,8 @@ function GenerateMoves() {
 					// Add Quiet Move
 				}
 			}
-		}
-		
-		
-		pceType = PIECE.wN;
+		}		
+
 	} else {
 		pceType = PIECES.bP;
 		
@@ -92,7 +93,6 @@ function GenerateMoves() {
 				}
 			}
 		}
-		
 		if(GameBoard.castlePerm & CASTLEBIT.BKCA) {
 			if(GameBoard.pieces[SQUARES.F8] == PIECES.EMTPY && GameBoard.pieces[SQUARES.G8] == PIECES.EMTPY) {
 				if(SqAttacked(SQUARES.F8, COLOURS.WHITE) == BOOL.FALSE && SqAttacked(SQUARES.E8, COLOURS.WHITE) == BOOL.FALSE) {
@@ -109,8 +109,33 @@ function GenerateMoves() {
 				}
 			}
 		}
-		
-		pceType = PIECE.bN;
+	}	
+	
+	pceIndex = LoopNonSlideIndex[GameBoard.side];
+	pce = LoopNonSlidePce[pceIndex++];
+	
+	while (pce != 0) {
+		for(pceNum = 0; pceNum < GameBoard.pceNum[pce]; ++pceNum) {
+			sq = GameBoard.pList[PCEINDEX(pce, pceNum)];
+			
+			for(index = 0; index < DirNum[pce]; index++) {
+				dir = PceDir[pce][index];
+				t_sq = sq + dir;
+				
+				if(SQOFFBOARD(t_sq) == BOOL.TRUE) {
+					continue;
+				}
+				
+				if(GameBoard.pieces[t_sq] != PIECES.EMPTY) {
+					if(PieceCol[GameBoard.pieces[t_sq]] != GameBoard.side) {
+						// add capture
+					}
+				} else {
+					// quiet move
+				}
+			}			
+		}	
+		pce = LoopNonSlidePce[pceIndex++];
 	}
 	
 }
