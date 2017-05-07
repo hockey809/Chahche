@@ -21,6 +21,10 @@ var CASTLEBIT = {WKCA:1, WQCA:2, BKCA:4, BQCA:8}
 
 var BOOL = { FALSE:0, TRUE:1 };
 
+var MAXGAMEMOVES = 2048;
+var MAXPOSITIONMOVES = 256;
+var MAXDEPTH = 64;
+
 var FilesBrd = new Array(BRD_SQ_NUM);
 var RanksBrd = new Array(BRD_SQ_NUM);
 
