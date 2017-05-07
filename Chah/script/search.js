@@ -38,6 +38,7 @@ function IsRepetition() {
 
 function AlphaBeta(alpha, beta, depth) {
 
+	SearchController.nodes++;
 	if(depth <= 0) {
 		return EvalPosition();
 	}
@@ -46,7 +47,7 @@ function AlphaBeta(alpha, beta, depth) {
 		CheckUp();
 	}
 	
-	SearchController.nodes++;
+	
 	
 	if( (IsRepetition() || GameBoard.fiftyMove >= 100) && GameBoard.ply != 0) {
 		return 0;
@@ -64,9 +65,6 @@ function AlphaBeta(alpha, beta, depth) {
 	var Score = -INFINITE;
 	
 	GenerateMoves();
-	
-	PrintMoveList();
-
 	
 	var MoveNum = 0;
 	var Legal = 0;
@@ -153,18 +151,32 @@ function SearchPosition() {
 	var bestMove = NOMOVE;
 	var bestScore = -INFINITE;
 	var currentDepth = 0;
-	
+	var line;
+	var PvNum;
+	var c;
 	ClearForSearch();
 	
-	for( currentDepth = 1; currentDepth <= /*SearchController.depth*/ 5; ++currentDepth) {
-		
-		/* AB */
-		
+	for( currentDepth = 1; currentDepth <= /*SearchController.depth*/ 5; ++currentDepth) {	
+	
+		bestScore = AlphaBeta(-INFINITE, INFINITE, currentDepth);
+					
 		if(SearchController.stop == BOOL.TRUE) {
 			break;
 		}
 		
+		bestMove = ProbePvTable();
+		line = 'D:' + currentDepth + ' Best:' + PrMove(bestMove) + ' Score:' + bestScore + 
+				' nodes:' + SearchController.nodes;
+				
+		PvNum = GetPvLine(currentDepth);
+		line += ' Pv:';
+		for( c = 0; c < PvNum; ++c) {
+			line += ' ' + PrMove(GameBoard.PvArray[c]);
+		}
+		console.log(line);
+						
 	}
+	
 	
 	SearchController.best = bestMove;
 	SearchController.thinking = BOOL.FALSE;

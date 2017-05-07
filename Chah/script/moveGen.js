@@ -1,3 +1,22 @@
+function MoveExists(move) {
+	
+	GenerateMoves();
+    
+	var index;
+	var moveFound = NOMOVE;
+	for(index = GameBoard.moveListStart[GameBoard.ply]; index < GameBoard.moveListStart[GameBoard.ply + 1]; ++index) {
+	
+		moveFound = GameBoard.moveList[index];	
+		if(MakeMove(moveFound) == BOOL.FALSE) {
+			continue;
+		}				
+		TakeMove();
+		if(move == moveFound) {
+			return BOOL.TRUE;
+		}
+	}
+	return BOOL.FALSE;
+}
 
 function MOVE(from, to, captured, promoted, flag) {
 	return (from | (to << 7) | (captured << 14) | (promoted << 20) | flag);
@@ -222,4 +241,3 @@ function GenerateMoves() {
 		pce = LoopSlidePce[pceIndex++];
 	}
 }
-
