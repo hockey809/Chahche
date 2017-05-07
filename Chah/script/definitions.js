@@ -25,6 +25,7 @@ var MAXGAMEMOVES = 2048;
 var MAXPOSITIONMOVES = 256;
 var MAXDEPTH = 64;
 var INFINITE = 30000;
+var MATE = 29000;
 
 var FilesBrd = new Array(BRD_SQ_NUM);
 var RanksBrd = new Array(BRD_SQ_NUM);
