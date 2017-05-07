@@ -7,6 +7,9 @@ $(function() {
 	PrintMoveList();
 	PrintPieceLists();
 	CheckBoard();
+	MakeMove(GameBoard.moveList[2]);
+	PrintBoard();
+	CheckBoard();
 });
 
 function InitFilesRanksBrd() {
